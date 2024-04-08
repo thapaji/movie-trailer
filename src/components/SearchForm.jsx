@@ -3,11 +3,13 @@ import { CustomCard } from "./CustomCard";
 import { fetchFromAPI } from "../helpers/axiosHelper";
 import { randomChar } from "../helpers/helpers";
 
-export const SearchForm = () => {
+export const SearchForm = ({ addToMovieList }) => {
   const [searchStr, setSearchStr] = useState("");
   const [searchedMovie, setSearchedMovie] = useState({});
+
   useEffect(() => {
     const c = randomChar();
+    console.log(c);
     fetchMovie(c);
   }, []);
 
@@ -22,8 +24,15 @@ export const SearchForm = () => {
   const fetchMovie = async (str) => {
     const movie = await fetchFromAPI(str);
     setSearchedMovie(movie);
-
   };
+
+  const handleOnDelete = ()=>{
+    setSearchedMovie([]);
+  }
+
+  const addMovie = (movie)=>{
+    addToMovieList(movie);
+  }
 
   return (
     <div className="bg-black p-5 rounded shadow-lg">
@@ -45,7 +54,11 @@ export const SearchForm = () => {
           </form>
         </div>
         <div className="col-md">
-          {searchedMovie?.imdbID && <CustomCard searchedMovie={searchedMovie} />}
+          {searchedMovie?.Response === "True" ? (
+            <CustomCard addToMovieList={addMovie} searchedMovie={searchedMovie} handleOnDelete={handleOnDelete}/>
+          ) : (
+            <div className="alert alert-danger">{searchedMovie.Error}</div>
+          )}
         </div>
       </div>
     </div>
